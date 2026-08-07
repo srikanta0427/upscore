@@ -7,9 +7,99 @@ import symbol from "../assets/icons/symbol.png";
 import srikanta from "../assets/rankers/srikanta.jpg";
 import soumya from "../assets/rankers/soumya.png";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const Landing = () => {
+  const navigate = useNavigate();
+
+  const [enrolling, setEnrolling] = useState(false);
+
+  // get user id through cookies
+  const [userId, setUserId] = useState("");
+
+  // true if user already a course enroll
+  const [isEnroll, setIsEnroll] = useState(false);
+
+  useEffect(() => {
+    const alreadyEnroll = axios
+      .get("http://localhost:8080/get-course-before-enroll", {
+        withCredentials: true,
+      })
+      .then((data) => {
+        console.log(data.data.success)
+        // true bcz user has already enrolling the course
+        if (data.data.success) setIsEnroll(true);
+      });
+  },);
+
+  const handleResume = () => {
+    navigate("/dashboard");
+  };
+
+  const handleEnroll = async () => {
+    setEnrolling(true);
+
+    try {
+      // 1. Check logged-in user
+      const userResponse = await axios.get("http://localhost:8080/get-user", {
+        withCredentials: true,
+      });
+
+      console.log("Login status:", userResponse.data.success);
+
+      // User is NOT logged in
+      if (!userResponse.data.success) {
+        navigate("/signin");
+        return;
+      }
+
+      // User IS logged in
+      const userId = userResponse.data.userId;
+
+      console.log("User ID:", userId);
+
+      // 2. Get course
+      const courseResponse = await axios.get(
+        "http://localhost:8080/get-course",
+        {
+          withCredentials: true,
+        },
+      );
+
+      console.log("Course response:", courseResponse.data);
+
+      if (!courseResponse.data.success) {
+        console.log("Course not found");
+        return;
+      }
+
+      const courseId = courseResponse.data.courseId;
+
+      console.log("Course ID:", courseId);
+
+      // 3. Enroll user
+      const enrollResponse = await axios.post(
+        "http://localhost:8080/course-enroll",
+        {
+          studentId: userId,
+          courseId: courseId,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (enrollResponse.data.success) {
+        alert(enrollResponse.data.message);
+      }
+    } catch (error) {
+      console.error("Enrollment error:", error);
+    } finally {
+      setEnrolling(false);
+    }
+  };
   return (
     <>
       <div className="bg-[#0d0d0d] w-full h-full">
@@ -148,13 +238,22 @@ const Landing = () => {
                   <li>✅ AI Features</li>
                 </ul>
               </div>
-              <div className="w-full mt-4">
-                <Link to="/signin" className="w-full">
-                  <button className="w-full rounded-md bg-white text-[#3902a0] p-3 font-medium">
-                    Enroll for Free
-                  </button>
-                </Link>
-              </div>
+              {isEnroll ? (
+                <button
+                  onClick={handleResume}
+                  className="w-full rounded-md mt-2 bg-white text-[#3902a0] p-2 font-medium hover:bg-gray-100 duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Resume
+                </button>
+              ) : (
+                <button
+                  onClick={handleEnroll}
+                  disabled={enrolling}
+                  className="w-full rounded-md mt-2 bg-white text-[#3902a0] p-2 font-medium hover:bg-gray-100 duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {enrolling ? "Enrolling..." : "Enroll for Free"}
+                </button>
+              )}
             </div>
           </div>
         </div>

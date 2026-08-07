@@ -39,7 +39,6 @@ const Signin = () => {
         withCredentials: true,
       },
     );
-
     if (!result.data.success) {
       setStatus(false);
       setMessage(result.data.message);

@@ -10,8 +10,9 @@ const PublicRoutes = ({children}) => {
         axios.get("http://localhost:8080/get-user",{
             withCredentials:true
         })
-        .then((data)=>{
-            setIsLoggedin(true);
+        .then((msg)=>{
+            if(msg.data.success) setIsLoggedin(true);
+            console.log(msg.data);
         })
         .catch(()=>{
             setLoading(false);
