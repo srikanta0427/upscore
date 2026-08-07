@@ -18,7 +18,9 @@ const Dashboard = () => {
 }, []);
   // callForUser();
 
-  return <div className="text-red-500">Dashboard</div>;
+  return <div className="bg-[#0d0d0d] h-100 w-full">
+    <h1 className="text-white">Dashboard</h1>
+  </div>;
 };
 
 export default Dashboard;

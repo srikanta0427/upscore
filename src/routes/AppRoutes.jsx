@@ -1,11 +1,11 @@
 import { Routes } from "react-router-dom";
-import PublicRoutes from "./PublicRoutes";
+import Routess from "./Routess";
 import Dashboard from "../../authPages/Dashboard";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {PublicRoutes()}
+      {Routess()}
     </Routes>
   );
 };

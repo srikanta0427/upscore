@@ -10,22 +10,7 @@ const Signin = () => {
   const [status, setStatus] = useState(true);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    console.log("use");
-    const checkUser = async () => {
-      try {
-        const user = await axios.get("http://localhost:8080/get-user", {
-          withCredentials: true,
-        });
 
-        if (user.data.success) navigate("/dashboard");
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    checkUser();
-  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({

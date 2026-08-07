@@ -1,20 +1,29 @@
-import { Route } from "react-router-dom";
-import MainLayout from "../layout/MainLayout";
-import Landing from "../pages/Landing";
-import Signin from "../pages/Signin";
-import Signup from "../pages/Signup";
-import Dashboard from "../../authPages/Dashboard";
+import React, { useEffect, useState } from 'react'
+import axios from 'axios';
+import Landing from '../pages/Landing';
+import { Navigate } from 'react-router-dom';
+const PublicRoutes = ({children}) => {
+    const [loading,setLoading] = useState(true);
+    const [isLoggedin, setIsLoggedin] = useState(false);
+    useEffect(()=>{
+        
+        axios.get("http://localhost:8080/get-user",{
+            withCredentials:true
+        })
+        .then((data)=>{
+            setIsLoggedin(true);
+        })
+        .catch(()=>{
+            setLoading(false);
+        })
+        .finally(()=>{
+            setLoading(false);
+        });
 
-const PublicRoutes = () => {
-  return (
-    <Route element={<MainLayout />}>
-      <Route path="/" element={<Landing />} />
-      <Route path="/signin" element={<Signin />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/dashboard" element={<Dashboard/>}/>
-    </Route>
-    
-  );
-};
+    },[]);
+    console.log("hii");
+    if (loading) return <div><h1>Loading....</h1></div>
+        return isLoggedin ? <Navigate to="/dashboard" /> : children;
+}
 
 export default PublicRoutes;
